@@ -1,0 +1,109 @@
+services:
+  deye-mqtt:
+    image: ghcr.io/kbialek/deye-inverter-mqtt
+    env_file:
+      - config.env
+    restart: unless-stopped
+    depends_on:
+      - mqtt5
+    volumes:
+     - ./plugins:/opt/deye_inverter_mqtt/plugins:ro
+     - ./src/deye_sensors_deye_hybrid.py:/opt/deye_inverter_mqtt/deye_sensors_deye_hybrid.py
+#     - ./src/deye_sensors_deye_hybrid_battery.py:/opt/deye_inverter_mqtt/deye_sensors_deye_hybrid_battery.py
+
+  # mqtt5 eclipse-mosquitto
+  mqtt5:
+    image: eclipse-mosquitto
+    container_name: mqtt5
+    ports:
+      - "1883:1883" #default mqtt port
+      - "9001:9001" #default mqtt port for websockets
+    volumes:
+      - ./mosquitto:/mosquitto/config:r
+      - ./mosquitto/data:/mosquitto/data:rw
+      - ./mosquitto/log:/mosquitto/log:rw
+    restart: unless-stopped
+
+  telegraf:
+    image: arm64v8/telegraf
+    container_name: telegraf
+    restart: always
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro  # Mount the Telegraf configuration file
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Mount the Docker socket to collect Docker metrics
+    depends_on:
+      - influxdb
+      - nginx
+      - mqtt5
+      - deye-mqtt
+    links:
+      - influxdb
+      - nginx
+      - mqtt5
+      - deye-mqtt
+    ports:
+      - '8125:8125'  # Expose Telegraf's StatsD port
+
+#  telegraf_second:
+#    image: telegraf
+#    container_name: telegraf_second
+#    restart: always
+#    volumes:
+#      - ./telegraf/telegraf_second.conf:/etc/telegraf/telegraf.conf:ro  # Mount the second Telegraf configuration file
+#    depends_on:
+#      - influxdb
+#    links:
+#      - influxdb
+#    ports:
+#      - '8126:8126'  # Expose the second Telegraf's StatsD port
+#    networks:
+#      - monitoring  # Connect the second Telegraf container to the monitoring network
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    volumes:
+      - ./nginx:/etc/nginx/conf.d  # Mount the Nginx configuration directory
+    ports:
+      - '8080:80'  # Expose Nginx on port 8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 2
+
+  influxdb:
+    image: arm64v8/influxdb:1.7.10
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUXDB_DB=influx
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+#      - INFLUXDB_V2_USERNAME=admin
+#      - INFLUXDB_V2_PASSWORD=admin
+    ports:
+      - '8086:8086'  # Expose InfluxDB on port 8086
+    volumes:
+      - influxdb_data:/var/lib/influxdb  # Mount the InfluxDB data directory
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    restart: always
+    depends_on:
+      - influxdb
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    links:
+      - influxdb
+    ports:
+      - '3000:3000'  # Expose Grafana on port 3000
+    volumes:
+      - grafana_data:/var/lib/grafana  # Mount the Grafana data directory
+
+volumes:
+  grafana_data: {}  # Volume for Grafana data
+  influxdb_data: {}  # Volume for InfluxDB data

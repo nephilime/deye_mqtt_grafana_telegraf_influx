@@ -1,0 +1,9 @@
+services:
+  deye-mqtt:
+    image: ghcr.io/kbialek/deye-inverter-mqtt
+    env_file:
+      - config.env
+    restart: unless-stopped
+    volumes: 
+     - ./plugins:/opt/deye_inverter_mqtt/plugins:ro
+    
