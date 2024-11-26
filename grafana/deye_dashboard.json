@@ -12,13 +12,6 @@
         "hide": true,
         "iconColor": "rgba(0, 211, 255, 1)",
         "name": "Annotations & Alerts",
-        "target": {
-          "limit": 100,
-          "matchAny": false,
-          "queryType": "annotations",
-          "tags": [],
-          "type": "dashboard"
-        },
         "type": "dashboard"
       }
     ]
@@ -27,7 +20,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "gnetId": 10914,
-  "graphTooltip": 2,
+  "graphTooltip": 0,
   "id": 5,
   "links": [],
   "panels": [
@@ -106,8 +99,7 @@
                 "value": "kwatth"
               },
               {
-                "id": "max",
-                "value": 50
+                "id": "max"
               }
             ]
           },
@@ -138,47 +130,27 @@
               },
               {
                 "id": "max"
-              },
-              {
-                "id": "min"
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "bat SOC"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "percent"
-              },
-              {
-                "id": "max"
               }
             ]
           }
         ]
       },
       "gridPos": {
-        "h": 15,
+        "h": 12,
         "w": 12,
         "x": 0,
         "y": 0
       },
       "id": 48,
-      "interval": "30s",
       "options": {
         "legend": {
           "calcs": [
             "min",
-            "max",
-            "last"
+            "max"
           ],
           "displayMode": "table",
           "placement": "bottom",
-          "showLegend": false
+          "showLegend": true
         },
         "tooltip": {
           "mode": "multi",
@@ -472,10 +444,6 @@
               {
                 "color": "#299c46",
                 "value": 50
-              },
-              {
-                "color": "blue",
-                "value": 80
               }
             ]
           },
@@ -494,11 +462,11 @@
               },
               {
                 "id": "min",
-                "value": 47
+                "value": 23
               },
               {
                 "id": "max",
-                "value": 57.6
+                "value": 27
               }
             ]
           },
@@ -551,31 +519,11 @@
                 }
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Power"
-            },
-            "properties": [
-              {
-                "id": "unit",
-                "value": "watt"
-              },
-              {
-                "id": "min",
-                "value": -5000
-              },
-              {
-                "id": "max",
-                "value": 5000
-              }
-            ]
           }
         ]
       },
       "gridPos": {
-        "h": 8,
+        "h": 7,
         "w": 5,
         "x": 12,
         "y": 0
@@ -746,8 +694,6 @@
           "measurement": "mqtt_consumer",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT last(\"value\") FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/battery/current') AND $timeFilter GROUP BY time($__interval)",
-          "rawQuery": false,
           "refId": "D",
           "resultFormat": "time_series",
           "select": [
@@ -814,50 +760,6 @@
               "value": "deye/$deye_num/radiator_temp"
             }
           ]
-        },
-        {
-          "alias": "Power",
-          "datasource": {
-            "uid": "$upsdatasource"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            }
-          ],
-          "hide": false,
-          "measurement": "mqtt_consumer",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT last(\"value\") FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/battery/power') AND $timeFilter GROUP BY time($__interval)",
-          "rawQuery": true,
-          "refId": "F",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "slimit": "",
-          "tags": [
-            {
-              "key": "topic::tag",
-              "operator": "=",
-              "value": "deye/1/battery/power"
-            }
-          ]
         }
       ],
       "timeFrom": "1h",
@@ -896,7 +798,7 @@
               },
               {
                 "color": "red",
-                "value": 1000
+                "value": 500
               }
             ]
           },
@@ -905,7 +807,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 2,
         "x": 17,
         "y": 0
@@ -923,7 +825,7 @@
           "calcs": [
             "lastNotNull"
           ],
-          "fields": "/^Watts$/",
+          "fields": "",
           "values": false
         },
         "showPercentChange": false,
@@ -1024,7 +926,7 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 2,
         "x": 19,
         "y": 0
@@ -1102,7 +1004,7 @@
           ]
         }
       ],
-      "timeFrom": "now/d",
+      "timeFrom": "now/y",
       "title": "Average UPS Load",
       "type": "stat"
     },
@@ -1186,8 +1088,8 @@
           "measurement": "mqtt_consumer",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT last(\"value\") FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/ac/daily_energy_bought') AND $timeFilter GROUP BY time($__interval) fill(previous)",
-          "rawQuery": true,
+          "query": "SELECT sum(\"LOADPCT\") / 100 * 865 FROM \"APC\" WHERE \"LOADPCT\" = 'loadpercent' AND $timeFilter GROUP BY time(30s) fill(null)",
+          "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -1215,307 +1117,6 @@
       ],
       "timeFrom": "now/d",
       "title": "Today's Usage Grid",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "default": false,
-        "type": "influxdb",
-        "uid": "$upsdatasource"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "watt"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 4,
-        "x": 17,
-        "y": 3
-      },
-      "hideTimeOverride": true,
-      "id": 52,
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "text": {},
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.2.0",
-      "targets": [
-        {
-          "alias": "Watts",
-          "datasource": {
-            "uid": "$upsdatasource"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "none"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": true,
-          "measurement": "mqtt_consumer",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT last(\"value\") FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/dc/pv1/power') AND $timeFilter GROUP BY time($__interval) fill(none)",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "topic::tag",
-              "operator": "=",
-              "value": "deye/2/dc/pv1/power"
-            }
-          ]
-        },
-        {
-          "alias": "Watts",
-          "datasource": {
-            "uid": "$upsdatasource"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "none"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": true,
-          "measurement": "mqtt_consumer",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT last(\"value\") FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/dc/pv2/power') AND $timeFilter GROUP BY time($__interval) fill(none)",
-          "rawQuery": true,
-          "refId": "B",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "topic::tag",
-              "operator": "=",
-              "value": "deye/2/dc/pv2/power"
-            }
-          ]
-        },
-        {
-          "datasource": {
-            "name": "Expression",
-            "type": "__expr__",
-            "uid": "__expr__"
-          },
-          "expression": "$A+$B",
-          "hide": false,
-          "refId": "Total_pv_power",
-          "type": "math"
-        }
-      ],
-      "timeFrom": "now/y",
-      "title": "Total PV power",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "default": false,
-        "type": "influxdb",
-        "uid": "$upsdatasource"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "thresholds"
-          },
-          "decimals": 2,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "currencyUAH"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 4,
-        "w": 3,
-        "x": 21,
-        "y": 4
-      },
-      "hideTimeOverride": true,
-      "id": 22,
-      "interval": "1m",
-      "maxDataPoints": 100,
-      "options": {
-        "colorMode": "value",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "text": {},
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.2.0",
-      "targets": [
-        {
-          "alias": "Costs",
-          "datasource": {
-            "uid": "$upsdatasource"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "previous"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "mqtt_consumer",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT last(\"value\") *$kwhprice FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/ac/daily_energy_bought') AND $timeFilter GROUP BY time($__interval) fill(previous)",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              },
-              {
-                "params": [
-                  "*$kwhprice"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "topic::tag",
-              "operator": "=",
-              "value": "deye/$deye_num/ac/daily_energy_bought"
-            }
-          ]
-        }
-      ],
-      "timeFrom": "now/d",
-      "title": "Today's Cost",
       "type": "stat"
     },
     {
@@ -1559,10 +1160,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 4,
         "x": 17,
-        "y": 6
+        "y": 4
       },
       "hideTimeOverride": true,
       "id": 49,
@@ -1687,7 +1288,127 @@
           ]
         }
       ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "default": false,
+        "type": "influxdb",
+        "uid": "$upsdatasource"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyUAH"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 3,
+        "x": 21,
+        "y": 4
+      },
+      "hideTimeOverride": true,
+      "id": 22,
+      "interval": "1m",
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "alias": "Costs",
+          "datasource": {
+            "uid": "$upsdatasource"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "mqtt_consumer",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT difference(mean(\"value\")) /1000*$kwhprice FROM \"modbus_value\" WHERE (\"type_instance\" = 'ups_Output.Energy') AND $timeFilter GROUP BY time($__interval) fill(none)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              },
+              {
+                "params": [
+                  "*$kwhprice"
+                ],
+                "type": "math"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "topic::tag",
+              "operator": "=",
+              "value": "deye/$deye_num/ac/daily_energy_bought"
+            }
+          ]
+        }
+      ],
       "timeFrom": "now/d",
+      "title": "Today's Cost",
       "type": "stat"
     },
     {
@@ -1733,10 +1454,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 7,
+        "h": 5,
         "w": 5,
         "x": 12,
-        "y": 8
+        "y": 7
       },
       "hideTimeOverride": true,
       "id": 50,
@@ -1937,17 +1658,16 @@
     },
     {
       "datasource": {
-        "default": false,
+        "default": true,
         "type": "influxdb",
-        "uid": "$upsdatasource"
+        "uid": "cdzuiq5pa8yrke"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
             "mode": "thresholds"
           },
-          "decimals": 2,
+          "fieldMinMax": false,
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1958,124 +1678,35 @@
               },
               {
                 "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "kwatth"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 3,
-        "w": 3,
-        "x": 21,
-        "y": 8
-      },
-      "hideTimeOverride": true,
-      "id": 53,
-      "options": {
-        "colorMode": "none",
-        "graphMode": "none",
-        "justifyMode": "auto",
-        "orientation": "horizontal",
-        "percentChangeColorMode": "standard",
-        "reduceOptions": {
-          "calcs": [],
-          "fields": "",
-          "values": false
-        },
-        "showPercentChange": false,
-        "text": {},
-        "textMode": "auto",
-        "wideLayout": true
-      },
-      "pluginVersion": "11.2.0",
-      "targets": [
-        {
-          "datasource": {
-            "uid": "$upsdatasource"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "previous"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "mqtt_consumer",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"value\") FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/ac/daily_energy_bought') AND $timeFilter fill(null)",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "topic::tag",
-              "operator": "=",
-              "value": "deye/$deye_num/ac/daily_energy_bought"
-            }
-          ]
-        }
-      ],
-      "timeFrom": "1d",
-      "title": "Yesterday's Usage Grid",
-      "type": "stat"
-    },
-    {
-      "datasource": {
-        "default": true,
-        "type": "influxdb",
-        "uid": "cdzuiq5pa8yrke"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "fieldMinMax": false,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
+                "value": 3600
               }
             ]
           },
           "unit": "dthms"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "upsd.ONLINE"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 5,
         "w": 4,
         "x": 17,
-        "y": 10
+        "y": 7
       },
       "hideTimeOverride": false,
       "id": 45,
@@ -2084,7 +1715,7 @@
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "center",
-        "orientation": "auto",
+        "orientation": "vertical",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
@@ -2123,7 +1754,7 @@
           "measurement": "upsd",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT COUNT(value)*30\nFROM \"mqtt_consumer\" \nWHERE \"value\" > 110\nAND (\"topic\" = 'deye/$deye_num/ac/l1/voltage') AND $timeFilter",
+          "query": "SELECT INTEGRAL(on_battery) AS \"BATTERY\" FROM (SELECT FLOOR(1/(\"value\"+1)) AS on_battery FROM \"mqtt_consumer\"  WHERE (\"topic\"::tag = 'deye/$deye_num/battery/daily_discharge') AND $timeFilter)\n\n",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
@@ -2149,14 +1780,14 @@
             "uid": "cdzuiq5pa8yrke"
           },
           "hide": false,
-          "query": "SELECT COUNT(value)*30\nFROM \"mqtt_consumer\" \nWHERE \"value\" < 110\nAND (\"topic\" = 'deye/$deye_num/ac/l1/voltage') AND $timeFilter",
+          "query": "SELECT INTEGRAL(on_line) AS \"ONLINE\" FROM (SELECT 1-(FLOOR(1/(value+1))) AS on_line FROM \"mqtt_consumer\"  WHERE (\"topic\"::tag = 'deye/$deye_num/battery/daily_discharge') AND $timeFilter)",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "time_series"
         }
       ],
       "timeFrom": "now/d",
-      "title": "Time on LINE/BAT",
+      "title": "Time on BAT/LINE",
       "type": "stat"
     },
     {
@@ -2186,27 +1817,29 @@
               }
             ]
           },
-          "unit": "currencyUAH"
+          "unit": "watth"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 4,
+        "h": 3,
         "w": 3,
         "x": 21,
-        "y": 11
+        "y": 8
       },
       "hideTimeOverride": true,
-      "id": 54,
+      "id": 16,
+      "interval": "7d",
+      "maxDataPoints": 100,
       "options": {
-        "colorMode": "value",
+        "colorMode": "none",
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "horizontal",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
-            "lastNotNull"
+            "sum"
           ],
           "fields": "",
           "values": false
@@ -2219,7 +1852,6 @@
       "pluginVersion": "11.2.0",
       "targets": [
         {
-          "alias": "Costs",
           "datasource": {
             "uid": "$upsdatasource"
           },
@@ -2232,7 +1864,7 @@
             },
             {
               "params": [
-                "previous"
+                "null"
               ],
               "type": "fill"
             }
@@ -2241,8 +1873,120 @@
           "measurement": "mqtt_consumer",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT max(\"value\") *$kwhprice FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/ac/daily_energy_bought') AND $timeFilter  fill(previous)",
-          "rawQuery": true,
+          "query": "SELECT sum(\"value\") FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/ac/daily_energy_bought') AND $timeFilter GROUP BY time($__interval) fill(null)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "topic::tag",
+              "operator": "=",
+              "value": "deye/$deye_num/ac/total_energy_bought"
+            }
+          ]
+        }
+      ],
+      "timeFrom": "now/w",
+      "title": "Total Usage",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "uid": "$upsdatasource"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 1,
+        "w": 3,
+        "x": 21,
+        "y": 11
+      },
+      "hideTimeOverride": true,
+      "id": 24,
+      "interval": "1d",
+      "maxDataPoints": 100,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "sum"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "text": {},
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "uid": "$upsdatasource"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "none"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "modbus_value",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT sum(\"LOADPCT\") / 100 * 865 FROM \"APC\" WHERE \"LOADPCT\" = 'loadpercent' AND $timeFilter GROUP BY time(30s) fill(null)",
+          "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -2258,8 +2002,12 @@
                 "type": "last"
               },
               {
+                "params": [],
+                "type": "difference"
+              },
+              {
                 "params": [
-                  "*$kwhprice"
+                  "/1000*$kwhprice"
                 ],
                 "type": "math"
               }
@@ -2267,15 +2015,15 @@
           ],
           "tags": [
             {
-              "key": "topic::tag",
+              "key": "type_instance",
               "operator": "=",
-              "value": "deye/$deye_num/ac/daily_energy_bought"
+              "value": "ups_Output.Energy"
             }
           ]
         }
       ],
-      "timeFrom": "1d",
-      "title": "Yesterday's Cost",
+      "timeFrom": "now/w",
+      "title": "This Week's Cost",
       "type": "stat"
     },
     {
@@ -2491,7 +2239,7 @@
         "h": 16,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 12
       },
       "hideTimeOverride": false,
       "id": 42,
@@ -2946,12 +2694,13 @@
           },
           "links": [],
           "mappings": [],
+          "max": 7000,
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -2962,6 +2711,21 @@
           "unit": "watt"
         },
         "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "APC.mean"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "rgb(0, 218, 255)",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
           {
             "matcher": {
               "id": "byName",
@@ -2976,6 +2740,30 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Watts"
+            },
+            "properties": [
+              {
+                "id": "max",
+                "value": 900
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              },
+              {
+                "id": "custom.axisLabel",
+                "value": "Watts"
+              }
+            ]
           }
         ]
       },
@@ -2983,7 +2771,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 31
+        "y": 28
       },
       "id": 2,
       "options": {
@@ -3204,8 +2992,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -3292,9 +3079,9 @@
       },
       "gridPos": {
         "h": 10,
-        "w": 12,
+        "w": 24,
         "x": 0,
-        "y": 41
+        "y": 38
       },
       "id": 51,
       "options": {
@@ -3605,175 +3392,30 @@
       ],
       "title": "Solar panel V,W,A",
       "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "default": false,
-        "type": "influxdb",
-        "uid": "$upsdatasource"
-      },
-      "description": "",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "fillOpacity": 80,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineWidth": 1,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "decimals": 2,
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
-          "unit": "currencyUAH"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 10,
-        "w": 12,
-        "x": 12,
-        "y": 41
-      },
-      "hideTimeOverride": true,
-      "id": 55,
-      "options": {
-        "barRadius": 0,
-        "barWidth": 0.97,
-        "fullHighlight": false,
-        "groupWidth": 0.7,
-        "legend": {
-          "calcs": [
-            "sum"
-          ],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "orientation": "auto",
-        "showValue": "auto",
-        "stacking": "none",
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        },
-        "xTickLabelRotation": 0,
-        "xTickLabelSpacing": 0
-      },
-      "pluginVersion": "11.2.0",
-      "targets": [
-        {
-          "alias": "Costs",
-          "datasource": {
-            "uid": "$upsdatasource"
-          },
-          "groupBy": [
-            {
-              "params": [
-                "$__interval"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "previous"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "mqtt_consumer",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "query": "SELECT max(\"value\") *$kwhprice FROM \"mqtt_consumer\" WHERE (\"topic\"::tag = 'deye/$deye_num/ac/daily_energy_bought') AND $timeFilter  GROUP BY time(1d) fill(previous)",
-          "rawQuery": true,
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [],
-                "type": "last"
-              },
-              {
-                "params": [
-                  "*$kwhprice"
-                ],
-                "type": "math"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "topic::tag",
-              "operator": "=",
-              "value": "deye/$deye_num/ac/daily_energy_bought"
-            }
-          ]
-        }
-      ],
-      "timeFrom": "7d/d",
-      "title": "Last week coast",
-      "type": "barchart"
     }
   ],
-  "refresh": "5s",
+  "refresh": " 30s",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": [
       {
         "current": {
-          "selected": false,
-          "text": "4.22",
-          "value": "4.22"
+          "selected": true,
+          "text": "4.20",
+          "value": "4.20"
         },
         "hide": 0,
         "label": "kWh Price",
         "name": "kwhprice",
         "options": [
           {
-            "selected": false,
+            "selected": true,
             "text": "4.20",
             "value": "4.20"
           }
         ],
-        "query": "4.22",
+        "query": "4.20",
         "skipUrlSync": false,
         "type": "textbox"
       },
@@ -3851,7 +3493,7 @@
       },
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "home",
           "value": "1"
         },
@@ -3908,6 +3550,6 @@
   "timezone": "browser",
   "title": "Deyes",
   "uid": "ce0rd0jimton4a",
-  "version": 65,
+  "version": 22,
   "weekStart": ""
 }

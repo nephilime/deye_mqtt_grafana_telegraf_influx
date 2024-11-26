@@ -11,6 +11,18 @@ services:
      - ./src/deye_sensors_deye_hybrid.py:/opt/deye_inverter_mqtt/deye_sensors_deye_hybrid.py
 #     - ./src/deye_sensors_deye_hybrid_battery.py:/opt/deye_inverter_mqtt/deye_sensors_deye_hybrid_battery.py
 
+#  deye-mqtt2:
+#    image: ghcr.io/kbialek/deye-inverter-mqtt
+#    env_file:
+#      - config2.env
+#    restart: unless-stopped
+#    depends_on:
+#      - mqtt5
+#    volumes:
+#     - ./plugins:/opt/deye_inverter_mqtt/plugins:ro
+#     - ./src/deye_sensors_deye_hybrid.py:/opt/deye_inverter_mqtt/deye_sensors_deye_hybrid.py
+#     - ./src/deye_sensors_deye_hybrid_battery.py:/opt/deye_inverter_mqtt/deye_sensors_deye_hybrid_battery.py
+
   # mqtt5 eclipse-mosquitto
   mqtt5:
     image: eclipse-mosquitto
@@ -28,9 +40,18 @@ services:
     image: arm64v8/telegraf
     container_name: telegraf
     restart: always
+    
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro  # Mount the Telegraf configuration file
       - /var/run/docker.sock:/var/run/docker.sock:ro  # Mount the Docker socket to collect Docker metrics
+      - /:/hostfs:ro
+    environment:
+      - HOST_ETC=/hostfs/etc
+      - HOST_PROC=/hostfs/proc
+      - HOST_SYS=/hostfs/sys
+      - HOST_VAR=/hostfs/var
+      - HOST_RUN=/hostfs/run
+      - HOST_MOUNT_PREFIX=/hostfs
     depends_on:
       - influxdb
       - nginx
@@ -43,6 +64,27 @@ services:
       - deye-mqtt
     ports:
       - '8125:8125'  # Expose Telegraf's StatsD port
+      
+      
+#  telegraf:
+#    image: arm64v8/telegraf
+#    container_name: telegraf
+#    restart: always
+#    volumes:
+#      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro  # Mount the Telegraf configuration file
+#      - /var/run/docker.sock:/var/run/docker.sock:ro  # Mount the Docker socket to collect Docker metrics
+#    depends_on:
+#      - influxdb
+#      - nginx
+#      - mqtt5
+#      - deye-mqtt
+#    links:
+#      - influxdb
+#      - nginx
+#      - mqtt5
+#      - deye-mqtt
+#    ports:
+#      - '8125:8125'  # Expose Telegraf's StatsD port      
 
 #  telegraf_second:
 #    image: telegraf
