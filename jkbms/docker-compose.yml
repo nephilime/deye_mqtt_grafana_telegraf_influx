@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  jkbms:
+    image: python:3.12-slim
+    container_name: jkbms_ble
+    working_dir: /app
+    volumes:
+      - ./jkbms/jk_main16.py:/app/jk_main16.py:ro
+    command: ["python", "/app/jk_main16.py"]
+    restart: unless-stopped
+
+    network_mode: host
+
+    privileged: true
+    volumes:
+      - /var/run/dbus:/var/run/dbus
+      - /dev/bus/usb:/dev/bus/usb

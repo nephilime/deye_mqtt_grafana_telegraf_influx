@@ -2,6 +2,12 @@ config.env
 config.json.default
 certs/
 
+jkbms/__pycache__/
+jkbms/bin
+jkbms/include/
+jkbms/lib/
+jkbms/lib64/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

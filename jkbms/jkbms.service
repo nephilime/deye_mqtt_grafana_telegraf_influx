@@ -1,0 +1,16 @@
+[Unit]
+Description=JK-BMS BLE to Influx exporter
+After=network-online.target bluetooth.service
+Wants=network-online.target bluetooth.service
+
+[Service]
+Type=simple
+User=ubuntu           # <-- заміни на свого юзера
+WorkingDirectory=/opt/jkbms
+ExecStart=/usr/bin/python3 /opt/jkbms/jk_main16.py
+Restart=always
+RestartSec=10
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

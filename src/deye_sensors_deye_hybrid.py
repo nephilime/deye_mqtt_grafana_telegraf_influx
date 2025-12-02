@@ -122,8 +122,8 @@ deye_hybrid_battery_71 = SingleRegisterSensor(
     groups=["deye_hybrid_battery"],
 )
 
-deye_hybrid_battery_189 = SingleRegisterSensor(
-    "Battery Status", 189, 1, mqtt_topic_suffix="battery/status", unit="", signed=False, groups=["deye_hybrid_battery"]
+deye_hybrid_battery_185 = SingleRegisterSensor(
+    "Battery Status", 185, 1, mqtt_topic_suffix="battery/status", unit="", signed=False, groups=["deye_hybrid_battery"]
 )
 
 deye_hybrid_battery_190 = SingleRegisterSensor(
@@ -604,7 +604,7 @@ deye_hybrid_sensors = [
     deye_hybrid_battery_74,
     deye_hybrid_battery_70,
     deye_hybrid_battery_71,
-    deye_hybrid_battery_189,
+    deye_hybrid_battery_185,
     deye_hybrid_battery_190,
     deye_hybrid_battery_183,
     deye_hybrid_battery_184,

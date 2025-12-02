@@ -1,0 +1,20 @@
+#!/usr/bin/env python3
+import asyncio
+from bleak import BleakClient, BleakScanner
+
+MAC = "C8:47:80:1A:13:A7"
+
+async def main():
+    dev = await BleakScanner.find_device_by_address(MAC, timeout=20.0)
+    if not dev:
+        print("Device not found")
+        return
+
+    async with BleakClient(dev) as client:
+        print("Connected:", client.is_connected)
+        for service in client.services:
+            print(f"SERVICE {service.uuid}")
+            for ch in service.characteristics:
+                print("  CHAR", ch.uuid, ch.properties)
+
+asyncio.run(main())
